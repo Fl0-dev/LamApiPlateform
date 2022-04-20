@@ -2,9 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CompanyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
 {
@@ -36,6 +40,18 @@ class Company
 
     #[ORM\Column(type: 'datetime')]
     private $modifiedAt;
+
+    #[ORM\ManyToOne(targetEntity: Workforce::class, inversedBy: 'companies')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $workforce;
+
+    #[ORM\OneToMany(mappedBy: 'company', targetEntity: Office::class, orphanRemoval: true)]
+    private $offices;
+
+    public function __construct()
+    {
+        $this->offices = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -134,6 +150,48 @@ class Company
     public function setModifiedAt(\DateTimeInterface $modifiedAt): self
     {
         $this->modifiedAt = $modifiedAt;
+
+        return $this;
+    }
+
+    public function getWorkforce(): ?Workforce
+    {
+        return $this->workforce;
+    }
+
+    public function setWorkforce(?Workforce $workforce): self
+    {
+        $this->workforce = $workforce;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Office>
+     */
+    public function getOffices(): Collection
+    {
+        return $this->offices;
+    }
+
+    public function addOffice(Office $office): self
+    {
+        if (!$this->offices->contains($office)) {
+            $this->offices[] = $office;
+            $office->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffice(Office $office): self
+    {
+        if ($this->offices->removeElement($office)) {
+            // set the owning side to null (unless already changed)
+            if ($office->getCompany() === $this) {
+                $office->setCompany(null);
+            }
+        }
 
         return $this;
     }

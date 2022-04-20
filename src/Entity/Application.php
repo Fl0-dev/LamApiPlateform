@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ApplicationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
 class Application
 {
@@ -21,6 +23,12 @@ class Application
 
     #[ORM\Column(type: 'datetime')]
     private $submitDate;
+
+    #[ORM\ManyToOne(targetEntity: Applicant::class, inversedBy: 'applications')]
+    private $applicant;
+
+    #[ORM\ManyToOne(targetEntity: Offer::class, inversedBy: 'applications')]
+    private $offer;
 
     public function getId(): ?int
     {
@@ -59,6 +67,30 @@ class Application
     public function setSubmitDate(\DateTimeInterface $submitDate): self
     {
         $this->submitDate = $submitDate;
+
+        return $this;
+    }
+
+    public function getApplicant(): ?Applicant
+    {
+        return $this->applicant;
+    }
+
+    public function setApplicant(?Applicant $applicant): self
+    {
+        $this->applicant = $applicant;
+
+        return $this;
+    }
+
+    public function getOffer(): ?Offer
+    {
+        return $this->offer;
+    }
+
+    public function setOffer(?Offer $offer): self
+    {
+        $this->offer = $offer;
 
         return $this;
     }

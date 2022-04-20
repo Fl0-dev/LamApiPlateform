@@ -3,29 +3,29 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\WorkforceRepository;
+use App\Repository\JobTitleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource()]
-#[ORM\Entity(repositoryClass: WorkforceRepository::class)]
-class Workforce
+#[ORM\Entity(repositoryClass: JobTitleRepository::class)]
+class JobTitle
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string', length: 75)]
     private $label;
 
-    #[ORM\OneToMany(mappedBy: 'workforce', targetEntity: Company::class)]
-    private $companies;
+    #[ORM\OneToMany(mappedBy: 'jobTitle', targetEntity: Offer::class)]
+    private $offers;
 
     public function __construct()
     {
-        $this->companies = new ArrayCollection();
+        $this->offers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -46,29 +46,29 @@ class Workforce
     }
 
     /**
-     * @return Collection<int, Company>
+     * @return Collection<int, Offer>
      */
-    public function getCompanies(): Collection
+    public function getOffers(): Collection
     {
-        return $this->companies;
+        return $this->offers;
     }
 
-    public function addCompany(Company $company): self
+    public function addOffer(Offer $offer): self
     {
-        if (!$this->companies->contains($company)) {
-            $this->companies[] = $company;
-            $company->setWorkforce($this);
+        if (!$this->offers->contains($offer)) {
+            $this->offers[] = $offer;
+            $offer->setJobTitle($this);
         }
 
         return $this;
     }
 
-    public function removeCompany(Company $company): self
+    public function removeOffer(Offer $offer): self
     {
-        if ($this->companies->removeElement($company)) {
+        if ($this->offers->removeElement($offer)) {
             // set the owning side to null (unless already changed)
-            if ($company->getWorkforce() === $this) {
-                $company->setWorkforce(null);
+            if ($offer->getJobTitle() === $this) {
+                $offer->setJobTitle(null);
             }
         }
 
