@@ -1,5 +1,5 @@
 api_platform:
-    mapping:
+    mapping: # permet de configurer les chemins d'accès aux ressources si aucune annotation n'est présente
         paths: ['%kernel.project_dir%/src/Entity']
     patch_formats:
         json: ['application/merge-patch+json']

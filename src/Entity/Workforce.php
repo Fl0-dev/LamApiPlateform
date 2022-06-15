@@ -3,42 +3,66 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\WorkforceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Controller\WorkforceGetAllController;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource()]
-#[ORM\Entity(repositoryClass: WorkforceRepository::class)]
+enum EnumWorkforce: string
+{
+    case LEVEL_1 = '1-a-9-salaries';
+    case LEVEL_2 = '10-a-19-salaries';
+    case LEVEL_3 = '20-a-49-salaries';
+    case LEVEL_4 = '50-a-99-salaries';
+    case LEVEL_5 = '100-a-199-salaries';
+    case LEVEL_6 = '200-a-499-salaries';
+    case LEVEL_7 = '500-a-999-salaries';
+    case LEVEL_8 = '1000-a-1999-salaries';
+    case LEVEL_9 = '2000-a-4999-salaries';
+    case LEVEL_10 = '5000-a-9999-salaries';
+    case LEVEL_11 = '+-de-10000-salaries';
+}
+
+#[ApiResource(
+    collectionOperations: [
+        'getAllLabel' => [
+            'method' => 'GET',
+            'path' => '/workforces/labels',
+            'controller' => WorkforceGetAllController::class,
+            'pagination_enabled' => false,
+            'filters' => [],
+            'openapi_context' => [
+                'summary' => 'Récupère toutes les valeurs des labels',
+            ]
+        ]
+    ]
+)]
 class Workforce
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string', enumType: EnumWorkforce::class, length: 50)]
     private $label;
 
     #[ORM\OneToMany(mappedBy: 'workforce', targetEntity: Company::class)]
     private $companies;
 
-    public function __construct()
-    {
-        $this->companies = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getLabel(): ?string
+    /**
+     * Get the value of label
+     */
+    public function getLabel()
     {
         return $this->label;
     }
 
-    public function setLabel(string $label): self
+    /**
+     * Set the value of label
+     *
+     * @return  self
+     */
+    public function setLabel($label)
     {
         $this->label = $label;
 
@@ -46,31 +70,41 @@ class Workforce
     }
 
     /**
-     * @return Collection<int, Company>
+     * Get the value of companies
      */
-    public function getCompanies(): Collection
+    public function getCompanies()
     {
         return $this->companies;
     }
 
-    public function addCompany(Company $company): self
+    /**
+     * Set the value of companies
+     *
+     * @return  self
+     */
+    public function setCompanies($companies)
     {
-        if (!$this->companies->contains($company)) {
-            $this->companies[] = $company;
-            $company->setWorkforce($this);
-        }
+        $this->companies = $companies;
 
         return $this;
     }
 
-    public function removeCompany(Company $company): self
+    /**
+     * Get the value of id
+     */
+    public function getId()
     {
-        if ($this->companies->removeElement($company)) {
-            // set the owning side to null (unless already changed)
-            if ($company->getWorkforce() === $this) {
-                $company->setWorkforce(null);
-            }
-        }
+        return $this->id;
+    }
+
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
 
         return $this;
     }

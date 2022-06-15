@@ -7,58 +7,82 @@ use App\Repository\OfferRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\serializer\Annotation\Groups;
 
-#[ApiResource()]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['read:getAll'] //indique l'annotation à utiliser pour récupérer certains champs lors d'un GET All
+    ],
+    itemOperations: [
+        'get' => [ //indique les champs à récupérer lors d'un GETBy
+            'normalization_context' => ['groups' => ['read:getAll', 'read:getBy']]
+        ]
+    ]
+)]
 #[ORM\Entity(repositoryClass: OfferRepository::class)]
 class Offer
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["read:getAll"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["read:getAll"])]
     private $title;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(["read:getBy"])]
     private $salaryMin;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(["read:getBy"])]
     private $salaryMax;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(["read:getAll"])]
     private $description;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(["read:getAll"])]
     private $publicationDate;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(["read:getBy"])]
     private $providedDate;
 
     #[ORM\ManyToOne(targetEntity: Office::class, inversedBy: 'offers')]
+    #[Groups(["read:getAll"])]
     private $office;
 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'offers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getBy"])]
     private $status;
 
     #[ORM\ManyToOne(targetEntity: LevelOfStudy::class, inversedBy: 'offers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getAll"])]
     private $levelOfStudy;
 
     #[ORM\ManyToOne(targetEntity: Experience::class, inversedBy: 'offers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getAll"])]
     private $experience;
 
     #[ORM\ManyToOne(targetEntity: JobTitle::class, inversedBy: 'offers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getAll"])]
     private $jobTitle;
 
     #[ORM\ManyToOne(targetEntity: ContractType::class, inversedBy: 'offers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getAll"])]
     private $contractType;
 
     #[ORM\OneToMany(mappedBy: 'offer', targetEntity: Application::class)]
+    #[Groups(["read:getBy"])]
     private $applications;
 
     public function __construct()

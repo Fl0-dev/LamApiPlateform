@@ -2,13 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ExperienceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'put', 
+        'patch', 
+        'delete', 
+        'get' =>[// pour supprimer la route on appelle :
+            'controller' => NotFoundAction::class, //le controller spécifique
+            'read' => false,// pour supprimer la lecture
+            'output' => false, // pour supprimer la sortie
+            'openapi_context' => [
+                'summary' => 'hidden',//Indique le summary à supprimer avec openapiFactory  
+            ]
+        ]
+    ]//cf aussi OpenApiFactory.php
+)]
 #[ORM\Entity(repositoryClass: ExperienceRepository::class)]
 class Experience
 {

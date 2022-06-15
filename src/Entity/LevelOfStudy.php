@@ -7,17 +7,38 @@ use App\Repository\LevelOfStudyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
 
-#[ApiResource()]
+#[ApiResource(
+    normalizationContext: [
+        "groups" => ["read:getAll"]
+    ],
+    itemOperations: [
+        "get" => [
+            "normalization_context" => ["groups" => ["read:getAll"]]
+        ],
+        "put" => [
+            "denormalization_context" => ["groups" => ["write:put"]]
+        ],
+        "delete" => [
+            "denormalization_context" => ["groups" => ["write:delete"]]
+        ]
+    ]
+)]
 #[ORM\Entity(repositoryClass: LevelOfStudyRepository::class)]
 class LevelOfStudy
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["read:getAll"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(["read:getAll", "write:put", "write:delete"]),
+      Length(min: 2, max: 50, groups: ["write:LevelOfStudy"])
+    ]
     private $label;
 
     #[ORM\OneToMany(mappedBy: 'levelOfStudy', targetEntity: Offer::class)]

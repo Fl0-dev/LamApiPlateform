@@ -3,46 +3,88 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\CompanyCountController;
 use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource()]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['read:getAll', 'read:Company'] //indique l'annotation à utiliser pour récupérer certains champs lors d'un GET All
+    ],
+    itemOperations: [
+        'get' => [ //indique les champs à récupérer lors d'un GETBy
+            'normalization_context' => ['groups' => ['read:getAll', 'read:getBy', 'read:Company']]
+        ],
+        'put' => [
+            'denormalization_context' => ['groups' => ['write:put', 'write:Company']]
+        ],
+        'delete' => [
+            'denormalization_context' => ['groups' => ['write:delete', 'write:Company']]
+        ]
+    ],
+    collectionOperations: [
+        'count' => [
+            'method' => 'GET',
+            'path' => '/companies/count',
+            'controller' => CompanyCountController::class,
+            'pagination_enabled' => false, //enlève la pagination de l'API
+            'filters' => [], //enlève les filtres de l'API
+            'openapi_context' => [
+                'summary' => 'Récupère le nombre de compagnies',
+                'description' => 'Récupère le nombre de compagnies',
+                'parameters' => [], //enlève les paramètres de l'API
+            ]
+        ]
+    ]
+
+)]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["read:getAll", "read:getBy"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(["read:getAll", "read:getBy", "write:put"])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["read:getBy", "write:put"])]
     private $logo;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["read:getBy", "write:put"])]
     private $slug;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(["read:getAll", "read:getBy", "write:put"])]
     private $webAddress;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["read:getAll", "read:getBy", "write:put"])]
     private $rhAddress;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(["read:getAll", "read:getBy", "write:put"])]
     private $description;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(["read:getBy"])]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(["read:getBy", "write:put"])]
     private $modifiedAt;
 
     #[ORM\ManyToOne(targetEntity: Workforce::class, inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:getAll", "read:getBy", "write:put"])]
     private $workforce;
 
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: Office::class, orphanRemoval: true)]
