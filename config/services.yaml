@@ -27,3 +27,7 @@ services:
         decorates: 'api_platform.openapi.factory' #déclare le service OpenApiFactory comme décorateur de api_platform.openapi.factory
         arguments: ['@App\OpenApi\OpenApiFactory.inner'] #indique où chercher le service OpenApiFactory
         autoconfigure: false #désactive l'autoconfiguration
+
+    App\DataProvider\DependencyDataProvider: #injection de dépendance du chemin racine du projet 
+        arguments: ['%kernel.project_dir%']
+

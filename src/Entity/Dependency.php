@@ -7,7 +7,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 
 #[ApiResource(
     collectionOperations: ['get'],
-    itemOperations: ['get']
+    itemOperations: ['get'],
+    paginationEnabled: false,
 )]
 class Dependency
 {
@@ -32,4 +33,28 @@ class Dependency
         $this->version = $version;
     }
 
+
+    /**
+     * Get the value of version
+     */ 
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the value of name
+     */ 
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the value of uuid
+     */ 
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
 }

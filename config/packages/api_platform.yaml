@@ -1,4 +1,5 @@
 api_platform:
+    show_webby: false # supprime l'araignée webby
     mapping: # permet de configurer les chemins d'accès aux ressources si aucune annotation n'est présente
         paths: ['%kernel.project_dir%/src/Entity']
     patch_formats:
