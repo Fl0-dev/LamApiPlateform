@@ -5,14 +5,30 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+
+    ############Autentification par JSON (api)#############################
+            # json_login: # à ajouter si l'on veut utiliser l'authentification JSON
+            #     check_path: api_login #nom du chemin de l'API qui va nous permettre de vérifier l'authentification
+            # logout:
+            #     path: api_logout
+
+    ############Autentification HTML#############################
+            # logout:
+            #     path: app_logout
+            # custom_authenticator: App\Security\AppAuthenticator
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

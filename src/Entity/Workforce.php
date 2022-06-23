@@ -35,6 +35,7 @@ enum EnumWorkforce: string
         ]
     ]
 )]
+#[ORM\Entity(repositoryClass: WorkforceRepository::class)]
 class Workforce
 {
 
