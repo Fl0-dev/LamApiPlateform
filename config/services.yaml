@@ -32,4 +32,3 @@ services:
 
     App\Repository\DependencyRepository: #injection de dépendance du chemin racine du projet 
         arguments: ['%kernel.project_dir%']
-

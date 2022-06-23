@@ -31,7 +31,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
             //'security' => 'is_granted("ROLE_USER")',// on ne peut pas récupérer l'utilisateur si on n'est pas connecté
             'openapi_context' => [
-                'security' => ['cookieAuth' => []],// on ne peut récupérer que si l'authentification est faite avec un cookie (voir OpenApiFactory)
+                'security' => [
+                    ['cookieAuth' => []],
+                    ['bearerAuth' => []],
+                ],// on ne peut récupérer que si l'authentification est faite avec un cookie (voir OpenApiFactory)
             ]
         ],
     ],

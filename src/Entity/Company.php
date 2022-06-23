@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
+    security: 'is_granted("ROLE_USER")',
     normalizationContext: [
         'groups' => ['read:getAll', 'read:Company'] //indique l'annotation à utiliser pour récupérer certains champs lors d'un GET All
     ],
@@ -26,6 +27,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ]
     ],
     collectionOperations: [
+        'get' => [
+            'openapi_context' => [
+                'security' => [
+                    ['bearerAuth' => []],
+                ],
+            ]
+        ],
         'count' => [
             'method' => 'GET',
             'path' => '/companies/count',
@@ -36,10 +44,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'Récupère le nombre de compagnies',
                 'description' => 'Récupère le nombre de compagnies',
                 'parameters' => [], //enlève les paramètres de l'API
+                'security' => [
+                    ['bearerAuth' => []],
+                ],
             ]
-        ]
+        ],
     ]
-
 )]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company

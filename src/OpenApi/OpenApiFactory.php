@@ -30,13 +30,66 @@ class OpenApiFactory implements OpenApiFactoryInterface
         $mePathItem = $openApi->getPaths()->getPath('/api/me')->withGet($meOperation);
         $openApi->getPaths()->addPath('/api/me', $mePathItem);//on ajoute le path /api/me
 
-        $schemas = $openApi->getComponents()->getSecuritySchemes();//récupération des schémas de sécurité
-        $schemas['coockieAuth'] = new \ArrayObject([ //création d'un schéma de sécurité
-            'type' => 'apiKey',
-            'in' => 'cookie',
-            'name' => 'PHPSESSID',
-        ]);
+        //Autentification avec cookie
+        // $schemas = $openApi->getComponents()->getSecuritySchemes();//récupération des schémas de sécurité
+        // $schemas['coockieAuth'] = new \ArrayObject([ //création d'un schéma de sécurité
+        //     'type' => 'apiKey',
+        //     'in' => 'cookie',
+        //     'name' => 'PHPSESSID',
+        // ]);
         //$openApi = $openApi->withSecurity([['coockieAuth' => []]]);//ajout du schéma de sécurité sur toutes les routes
+
+        //Autentification avec JWT
+        $schemas = $openApi->getComponents()->getSecuritySchemes();
+        $schemas['bearerAuth'] = new \ArrayObject([
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
+        ]);
+
+
+        //Route pour récupérer le JWT
+        $schemas['Token'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'token' => [
+                    'type' => 'string',
+                    'readOnly' => true,
+                ],
+            ],
+        ]);
+
+        $pathItem = new PathItem(
+            ref: 'JWT Token',
+            post: new Operation(
+                operationId: 'postCredentialsItem',
+                tags: ['Token'],
+                responses: [
+                    '200' => [
+                        'description' => 'Get JWT token',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    '$ref' => '#/components/schemas/Token',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                summary: 'Get JWT token to login.',
+                requestBody: new RequestBody(
+                    description: 'Generate new JWT Token',
+                    content: new \ArrayObject([
+                        'application/json' => [
+                            'schema' => [
+                                '$ref' => '#/components/schemas/Credentials',
+                            ],
+                        ],
+                    ]),
+                ),
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/authentication_token', $pathItem);
 
         //création d'un schéma pour autentification
         $schemas = $openApi->getComponents()->getSchemas();
