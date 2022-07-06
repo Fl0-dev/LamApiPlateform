@@ -127,7 +127,7 @@ class OpenApiFactory implements OpenApiFactoryInterface
                         'content' => [
                             'application/json' => [
                                 'schema' => [
-                                    '$ref' => '#/components/schemas/User-user.read',// le chemein qui demande une autentitfication
+                                    '$ref' => '#/components/schemas/User-user.read',// le chemin qui demande une autentitfication
                                 ],
                             ],
                         ],

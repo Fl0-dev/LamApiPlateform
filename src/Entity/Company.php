@@ -17,17 +17,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     itemOperations: [
         'get' => [ //indique les champs à récupérer lors d'un GETBy
-            'normalization_context' => ['groups' => ['read:getAll', 'read:getBy', 'read:Company']]
+            'normalization_context' => ['groups' => ['read:getAll', 'read:getBy', 'read:Company']],
+            'openapi_context' => [
+                'security' => [
+                    ['bearerAuth' => []],
+                ],
+            ]
         ],
         'put' => [
             'denormalization_context' => ['groups' => ['write:put', 'write:Company']]
         ],
         'delete' => [
             'denormalization_context' => ['groups' => ['write:delete', 'write:Company']]
-        ]
+        ],
     ],
     collectionOperations: [
-        'get' => [
+        'get','post' => [
             'openapi_context' => [
                 'security' => [
                     ['bearerAuth' => []],
@@ -52,7 +57,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
-class Company
+class Company implements UserOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -99,6 +104,9 @@ class Company
 
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: Office::class, orphanRemoval: true)]
     private $offices;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'companies')]
+    private $user;
 
     public function __construct()
     {
@@ -244,6 +252,18 @@ class Company
                 $office->setCompany(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

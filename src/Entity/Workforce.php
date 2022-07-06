@@ -32,10 +32,11 @@ enum EnumWorkforce: string
             'openapi_context' => [
                 'summary' => 'Récupère toutes les valeurs des labels',
             ]
-        ]
+            ],
+            'get'
     ]
 )]
-#[ORM\Entity(repositoryClass: WorkforceRepository::class)]
+#[ORM\Entity]
 class Workforce
 {
 
@@ -44,7 +45,7 @@ class Workforce
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', enumType: EnumWorkforce::class, length: 50)]
+    #[ORM\Column(type: 'string', length: 50)]
     private $label;
 
     #[ORM\OneToMany(mappedBy: 'workforce', targetEntity: Company::class)]
