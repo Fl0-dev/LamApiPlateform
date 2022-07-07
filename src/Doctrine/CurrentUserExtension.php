@@ -26,12 +26,12 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
 
             $user = $this->security->getUser();//récupère l'utilisateur connecté 
 
-            if ($user) {//si connexion, on ne prend que les class en lien avec l'utilisateur connecté
-                $queryBuilder->andWhere("$rootAlias.user = :current_user")//le rajoute dans la requête
-                    ->setParameter('current_user', $this->security->getUser()->getId()); //fonctionne quand même  
-            } else {//sinon, on prend toutes les class publiques
-                $queryBuilder->andWhere("$rootAlias.user IS NULL");
-            }
+            // if ($user) {//si connexion, on ne prend que les class en lien avec l'utilisateur connecté
+            //     $queryBuilder->andWhere("$rootAlias.user = :current_user")//le rajoute dans la requête
+            //         ->setParameter('current_user', $this->security->getUser()->getId()); //fonctionne quand même  
+            // } else {//sinon, on prend toutes les class publiques
+            //     $queryBuilder->andWhere("$rootAlias.user IS NULL");
+            // }
         }
     }
 

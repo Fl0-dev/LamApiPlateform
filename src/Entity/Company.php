@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Attribute\ApiAuthGroups;
 use App\Controller\CompanyCountController;
 use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
     ],
     collectionOperations: [
-        'get','post' => [
+        'get' => [
             'openapi_context' => [
                 'security' => [
                     ['bearerAuth' => []],
@@ -53,11 +54,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     ['bearerAuth' => []],
                 ],
             ]
-        ],
-    ]
-)]
+        ]
+    ],
+    
+),
+ApiAuthGroups([
+    'CAN_EDIT' => ['read:getAll:Owner'],
+    'ROLE_USER' => ['read:getAll:User']
+]),
+]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
-class Company implements UserOwnedInterface
+class Company implements UserOwnedInterface //interface qui permet de gérer en fonction du user
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -74,7 +81,7 @@ class Company implements UserOwnedInterface
     private $logo;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["read:getBy", "write:put"])]
+    #[Groups(["read:getBy", "write:put", "read:getAll:User"])]
     private $slug;
 
     #[ORM\Column(type: 'string', length: 100)]
@@ -90,22 +97,23 @@ class Company implements UserOwnedInterface
     private $description;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(["read:getBy"])]
+    #[Groups(["read:getBy", "read:getAll:Owner"])]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(["read:getBy", "write:put"])]
+    #[Groups(["read:getBy", "write:put", "read:getAll:Owner"])]
     private $modifiedAt;
 
     #[ORM\ManyToOne(targetEntity: Workforce::class, inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["read:getAll", "read:getBy", "write:put"])]
+    #[Groups(["read:getAll:User", "read:getBy", "write:put"])]
     private $workforce;
 
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: Office::class, orphanRemoval: true)]
     private $offices;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'companies')]
+    #[Groups(["read:getAll:Owner"])]
     private $user;
 
     public function __construct()
