@@ -10,7 +10,6 @@ class WorkforceGetAllController extends AbstractController
 {
     public function __invoke(): array
     {
-
         $data = EnumWorkforce::cases();
         return $data;
     }

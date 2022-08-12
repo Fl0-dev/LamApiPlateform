@@ -5,12 +5,18 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Attribute\ApiAuthGroups;
 use App\Controller\CompanyCountController;
+use App\Controller\CompanyImageController;
 use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Vich\UploaderBundle\Entity\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+/**
+ * @Vich\Uploadable
+ */
 #[ApiResource(
     security: 'is_granted("ROLE_USER")',
     normalizationContext: [
@@ -31,6 +37,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'delete' => [
             'denormalization_context' => ['groups' => ['write:delete', 'write:Company']]
         ],
+        'image' => [
+            'method' => 'POST',
+            'path' => '/company/{id}/image',
+            'deserialize' => false, //pour éviter de deserializer le fichier
+            'controller' => CompanyImageController::class,
+        ]
+
     ],
     collectionOperations: [
         'get' => [
@@ -56,7 +69,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
             ]
         ]
     ],
-    
 ),
 ApiAuthGroups([
     'CAN_EDIT' => ['read:getAll:Owner'],
@@ -77,8 +89,14 @@ class Company implements UserOwnedInterface //interface qui permet de gérer en 
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["read:getBy", "write:put"])]
+    #[Groups(["read:getBy", "write:put", "read:getAll"])]
     private $logo;
+
+    /**
+     * @var File|null
+    * @Vich\UploadableField(mapping="company_logo", fileNameProperty="logo")
+    */ 
+    private ?File $file = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["read:getBy", "write:put", "read:getAll:User"])]
@@ -272,6 +290,26 @@ class Company implements UserOwnedInterface //interface qui permet de gérer en 
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of file
+     */ 
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set the value of file
+     *
+     * @return  self
+     */ 
+    public function setFile($file)
+    {
+        $this->file = $file;
 
         return $this;
     }
